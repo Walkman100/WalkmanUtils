@@ -20,12 +20,21 @@ Imports System.Runtime.InteropServices
 <assembly: AssemblyVersion("1.0.*")>
 
 Module Program
-    Sub Main()
-        Console.WriteLine("Hello World!")
-        
-        ' TODO: Implement Functionality Here
-        
-        Console.Write("Press any key to continue . . . ")
-        Console.ReadKey(True)
+    Sub Main(args() As String)
+        If args.Length <> 0 Then
+            WriteUsage
+        Else
+            Console.WriteLine(WalkmanLib.IsAdmin)
+        End If
+    End Sub
+    
+    Sub WriteUsage()
+        Dim flags As String = vbNewLine & "Checks whether the current process is elevated (running with administrator permissions). Outputs True if running with administrator permissions, False if not (WalkmanUtils - https://github.com/Walkman100/WalkmanUtils)"
+        Dim programPath As String = System.Reflection.Assembly.GetExecutingAssembly().CodeBase
+        Dim programFile As String = programPath.Substring(programPath.LastIndexOf("/") +1)
+        If My.Computer.Info.OSPlatform = "Unix" Then
+            programFile = "mono " & programFile
+        End If
+        Console.WriteLine("Usage: " & programFile & flags)
     End Sub
 End Module
