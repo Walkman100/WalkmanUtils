@@ -8,8 +8,9 @@
     <MyType>Console</MyType>
     <RootNamespace>IsAdmin</RootNamespace>
     <AssemblyName>IsAdmin</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile>
+    </TargetFrameworkProfile>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <OptionInfer>On</OptionInfer>
     <NoWin32Manifest>False</NoWin32Manifest>
@@ -28,6 +29,7 @@
     <RegisterForComInterop>False</RegisterForComInterop>
     <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
     <FileAlignment>4096</FileAlignment>
+    <Prefer32Bit>True</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <OutputPath>bin\Debug\</OutputPath>
@@ -40,9 +42,10 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <OutputPath>bin\Release\</OutputPath>
     <DebugSymbols>False</DebugSymbols>
-    <DebugType>None</DebugType>
+    <DebugType>Full</DebugType>
     <Optimize>True</Optimize>
     <DefineConstants>TRACE=1</DefineConstants>
+    <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -71,6 +74,9 @@
     <Import Include="System.Collections.Generic" />
     <Import Include="System.Data" />
     <Import Include="System.Diagnostics" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>
