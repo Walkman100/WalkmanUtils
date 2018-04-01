@@ -27,11 +27,11 @@ Class OpenWith
         If args.Length <> 2 Then
             Application.EnableVisualStyles()
             MsgBox(GetUsage(), MsgBoxStyle.Information, "Command line arguments incorrect")
-        ElseIf IO.File.Exists(args(1)) Then
+        ElseIf IO.File.Exists(args(1)) Or IO.Directory.Exists(args(1)) Then
             WalkmanLib.OpenWith(args(1))
         Else
             Application.EnableVisualStyles()
-            MsgBox("File """ & args(1) & """ not found!" & vbNewLine & vbNewLine & GetUsage(), MsgBoxStyle.Exclamation, "File not found")
+            MsgBox("File or directory """ & args(1) & """ not found!" & vbNewLine & vbNewLine & GetUsage(), MsgBoxStyle.Exclamation, "Path not found")
         End If
         
         Do Until 0 <> 0
@@ -41,7 +41,7 @@ Class OpenWith
     End Sub
     
     Function GetUsage() As String
-        Dim flags As String = " <path>" & vbNewLine & "Open the Open With dialog box for a file path"
+        Dim flags As String = " <path>" & vbNewLine & "Open the Open With dialog box for a path"
         flags &= vbNewLine & "WalkmanUtils - https://github.com/Walkman100/WalkmanUtils"
         Dim programPath As String = System.Reflection.Assembly.GetExecutingAssembly().CodeBase
         Dim programFile As String = programPath.Substring(programPath.LastIndexOf("/") +1)

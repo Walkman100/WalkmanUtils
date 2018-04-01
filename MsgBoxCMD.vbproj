@@ -48,6 +48,8 @@
     <Optimize>True</Optimize>
     <DefineConstants>TRACE=1</DefineConstants>
     <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
+    <StartAction>Program</StartAction>
+    <StartProgram>bin\Release\MsgBox.com</StartProgram>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -77,4 +79,7 @@
     <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <PostBuildEvent>move MsgBoxCMD.exe MsgBox.com</PostBuildEvent>
+  </PropertyGroup>
 </Project>
