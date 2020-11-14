@@ -7,7 +7,6 @@ Imports System
 Imports System.Reflection
 Imports System.Windows.Forms
 Imports Microsoft.VisualBasic
-Imports Microsoft.VisualBasic.ApplicationServices
 
 <assembly: AssemblyTitle("OpenWith")>
 <assembly: AssemblyDescription("")>

@@ -52,6 +52,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Properties\Application.vb" />
     <Compile Include="Properties\AssemblyInfo.vb" />
     <Compile Include="UncompressFile.vb" />
     <Compile Include="WalkmanLib\WalkmanLibWin32.vb" />

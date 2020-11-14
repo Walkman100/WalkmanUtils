@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompressFile.vb" />
+    <Compile Include="Properties\Application.vb" />
     <Compile Include="Properties\AssemblyInfo.vb" />
     <Compile Include="WalkmanLib\WalkmanLibWin32.vb" />
   </ItemGroup>

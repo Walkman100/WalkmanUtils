@@ -5,7 +5,6 @@ Option Infer Off
 
 Imports System
 Imports System.Reflection
-Imports Microsoft.VisualBasic.ApplicationServices
 
 <assembly: AssemblyTitle("Hash")>
 <assembly: AssemblyDescription("")>
@@ -59,16 +58,7 @@ Class Hash
 End Class
 
 Namespace My
-    ' This file controls the behaviour of the application.
     Partial Class MyApplication
-        Public Sub New()
-            MyBase.New(AuthenticationMode.Windows)
-            Me.IsSingleInstance = False
-            Me.EnableVisualStyles = True
-            Me.SaveMySettingsOnExit = True
-            Me.ShutDownStyle = ShutdownMode.AfterMainFormCloses
-        End Sub
-        
         Protected Overrides Sub OnCreateMainForm()
             Me.MainForm = My.Forms.Hash
         End Sub
