@@ -74,12 +74,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="UncompressFile.vb" />
-    <Compile Include="WalkmanLib\WalkmanLibWin32.vb">
-      <Link>WalkmanLibWin32.vb</Link>
-    </Compile>
+    <Compile Include="WalkmanLib\WalkmanLibWin32.vb" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties" />
+    <Folder Include="WalkmanLib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\App.config" />

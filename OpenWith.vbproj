@@ -71,12 +71,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OpenWith.vb" />
-    <Compile Include="WalkmanLib\WalkmanLibDotNet.vb">
-      <Link>WalkmanLibDotNet.vb</Link>
-    </Compile>
+    <Compile Include="WalkmanLib\WalkmanLibDotNet.vb" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties" />
+    <Folder Include="WalkmanLib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\App.config" />
