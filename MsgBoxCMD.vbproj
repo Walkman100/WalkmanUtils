@@ -66,14 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MsgBoxCMD.vb" />
-  </ItemGroup>
-  <ItemGroup>
-    <Import Include="Microsoft.VisualBasic" />
-    <Import Include="System" />
-    <Import Include="System.Collections" />
-    <Import Include="System.Collections.Generic" />
-    <Import Include="System.Data" />
-    <Import Include="System.Diagnostics" />
+    <Compile Include="Properties\AssemblyInfo.vb" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties" />

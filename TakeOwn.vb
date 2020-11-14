@@ -1,24 +1,19 @@
-﻿Imports System.Reflection
-Imports System.Runtime.CompilerServices
-Imports System.Runtime.InteropServices
+﻿Option Explicit On
+Option Strict On
+Option Compare Binary
+Option Infer Off
+
+Imports System
+Imports System.Reflection
+Imports System.Windows.Forms
+Imports Microsoft.VisualBasic
 Imports Microsoft.VisualBasic.ApplicationServices
-' Information about this assembly is defined by the following attributes.
+
 <assembly: AssemblyTitle("TakeOwn")>
 <assembly: AssemblyDescription("")>
 <assembly: AssemblyConfiguration("")>
 <assembly: AssemblyCompany("")>
 <assembly: AssemblyProduct("TakeOwn")>
-<assembly: AssemblyCopyright("Copyright 2018")>
-<assembly: AssemblyTrademark("")>
-<assembly: AssemblyCulture("")>
-' This sets the default COM visibility of types in the assembly to invisible.
-' If you need to expose a type to COM, use <ComVisible(true)> on that type.
-<assembly: ComVisible(False)>
-' The assembly version has following format :
-' Major.Minor.Build.Revision
-' You can specify all values by your own or you can build default build and revision
-' numbers with the '*' character (the default):
-<assembly: AssemblyVersion("1.0.*")>
 
 Class TakeOwn
     Inherits System.Windows.Forms.Form
@@ -31,7 +26,7 @@ Class TakeOwn
             WalkmanLib.TakeOwnership(args(1))
         Else
             Application.EnableVisualStyles()
-            MsgBox("File or directory """ & args(1) & """ not found!" & vbNewLine & vbNewLine & GetUsage(), MsgBoxStyle.Exclamation, "Path not found")
+            MsgBox("File or directory """ & args(1) & """ not found!" & Environment.NewLine & Environment.NewLine & GetUsage(), MsgBoxStyle.Exclamation, "Path not found")
         End If
         
         Do Until 0 <> 0
@@ -41,8 +36,8 @@ Class TakeOwn
     End Sub
     
     Function GetUsage() As String
-        Dim flags As String = " <path>" & vbNewLine & "Take Ownership of a file or recursively Take Ownership of a folder"
-        flags &= vbNewLine & "WalkmanUtils - https://github.com/Walkman100/WalkmanUtils"
+        Dim flags As String = " <path>" & Environment.NewLine & "Take Ownership of a file or recursively Take Ownership of a folder"
+        flags &= Environment.NewLine & "WalkmanUtils - https://github.com/Walkman100/WalkmanUtils"
         Dim programPath As String = System.Reflection.Assembly.GetExecutingAssembly().CodeBase
         Dim programFile As String = programPath.Substring(programPath.LastIndexOf("/") +1)
         If My.Computer.Info.OSPlatform = "Unix" Then

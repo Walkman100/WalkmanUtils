@@ -61,16 +61,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Import Include="Microsoft.VisualBasic" />
-    <Import Include="System" />
-    <Import Include="System.Collections" />
-    <Import Include="System.Collections.Generic" />
-    <Import Include="System.Diagnostics" />
-    <Import Include="System.Drawing" />
-    <Import Include="System.Windows.Forms" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="OpenWith.vb" />
+    <Compile Include="Properties\AssemblyInfo.vb" />
     <Compile Include="WalkmanLib\WalkmanLibDotNet.vb" />
   </ItemGroup>
   <ItemGroup>
