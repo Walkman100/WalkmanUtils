@@ -43,11 +43,17 @@ Public Module Common
         If formatItem IsNot Nothing Then
             msg = String.Format(msg, formatItem)
         End If
-        Console.WriteLine(msg)
+        Console.Error.WriteLine(msg)
 
-        Console.Write("Press any key to continue . . . ")
-        Console.ReadKey(True)
-        Console.WriteLine()
+        If Environment.GetEnvironmentVariable("OS") = "Windows_NT" _
+                AndAlso Console.IsOutputRedirected = False _
+                AndAlso Console.IsErrorRedirected = False _
+                AndAlso Console.IsInputRedirected = False Then
+            Console.Error.Write("Press any key to continue . . . ")
+            Console.ReadKey(True)
+            Console.Error.WriteLine()
+        End If
+
         Environment.Exit(errorCode)
     End Sub
 End Module

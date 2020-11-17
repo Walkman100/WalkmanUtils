@@ -15,8 +15,8 @@ Imports System.Reflection
 
 Module Program
     Function WriteUsage(Optional input As String = Nothing) As Boolean
-        Console.WriteLine("Usage: " & GetProgramFileName() & " [OPTION] <FILE>")
-        Console.WriteLine("Gets the compressed size of a file (WalkmanUtils - https://github.com/Walkman100/WalkmanUtils)" & Environment.NewLine)
+        Console.Error.WriteLine("Usage: " & GetProgramFileName() & " [OPTION] <FILE>")
+        Console.Error.WriteLine("Gets the compressed size of a file (WalkmanUtils - https://github.com/Walkman100/WalkmanUtils)" & Environment.NewLine)
         WalkmanLib.EchoHelp(flagDict, input)
         Environment.Exit(0)
         Return True
@@ -48,10 +48,12 @@ Module Program
                         Dim compressedSize As Double = WalkmanLib.GetCompressedSize(file)
                         Console.WriteLine(compressedSize)
                     Catch ex As IO.IOException
-                        Console.WriteLine("Exception getting compressed size: " & ex.Message)
+                        If Console.IsOutputRedirected Then Console.WriteLine("?")
+                        Console.Error.WriteLine("Exception getting compressed size: " & ex.Message)
                     End Try
                 Else
-                    Console.WriteLine("File """ & file & """ not found!")
+                    If Console.IsOutputRedirected Then Console.WriteLine("?")
+                    Console.Error.WriteLine("File """ & file & """ not found!")
                 End If
             Next
         End If
