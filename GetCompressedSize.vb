@@ -4,38 +4,56 @@ Option Compare Binary
 Option Infer Off
 
 Imports System
+Imports System.Collections.Generic
 Imports System.Reflection
 
-<assembly: AssemblyTitle("GetCompressedSize")>
-<assembly: AssemblyDescription("")>
-<assembly: AssemblyConfiguration("")>
-<assembly: AssemblyCompany("")>
-<assembly: AssemblyProduct("GetCompressedSize")>
+<Assembly: AssemblyTitle("GetCompressedSize")>
+<Assembly: AssemblyDescription("")>
+<Assembly: AssemblyConfiguration("")>
+<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyProduct("GetCompressedSize")>
 
 Module Program
+    Function WriteUsage(Optional input As String = Nothing) As Boolean
+        Console.WriteLine("Usage: " & GetProgramFileName() & " [OPTION] <FILE>")
+        Console.WriteLine("Gets the compressed size of a file (WalkmanUtils - https://github.com/Walkman100/WalkmanUtils)" & Environment.NewLine)
+        WalkmanLib.EchoHelp(flagDict, input)
+        Environment.Exit(0)
+        Return True
+    End Function
+
+    Private flagDict As New Dictionary(Of String, WalkmanLib.FlagInfo) From {
+        {"help", New WalkmanLib.FlagInfo With {
+            .shortFlag = "h"c,
+            .description = "Show Help",
+            .hasArgs = True,
+            .optionalArgs = True,
+            .argsInfo = "[flag]",
+            .action = AddressOf WriteUsage
+        }}
+    }
+
     Sub Main(args() As String)
-        If args.Length <> 1 Then
-            WriteUsage
-        ElseIf IO.File.Exists(args(0)) Then
-            Try
-                Dim compressedSize As Double = WalkmanLib.GetCompressedSize(args(0))
-                Console.WriteLine(compressedSize)
-            Catch ex As IO.IOException
-                Console.WriteLine("Exception getting compressed size: " & ex.Message)
-            End Try
+        Dim res As WalkmanLib.ResultInfo = WalkmanLib.ProcessArgs(args, flagDict, True)
+
+        If res.gotError Then
+            ExitE(res.errorInfo)
+        ElseIf res.extraParams.Count < 1 Then
+            WriteUsage()
+
         Else
-            Console.WriteLine("File """ & args(0) & """ not found!")
-            WriteUsage
+            For Each file As String In res.extraParams
+                If IO.File.Exists(file) Then
+                    Try
+                        Dim compressedSize As Double = WalkmanLib.GetCompressedSize(file)
+                        Console.WriteLine(compressedSize)
+                    Catch ex As IO.IOException
+                        Console.WriteLine("Exception getting compressed size: " & ex.Message)
+                    End Try
+                Else
+                    Console.WriteLine("File """ & file & """ not found!")
+                End If
+            Next
         End If
-    End Sub
-    
-    Sub WriteUsage()
-        Dim flags As String = " <path>" & Environment.NewLine & "Get the compressed size of a file (WalkmanUtils - https://github.com/Walkman100/WalkmanUtils)"
-        Dim programPath As String = System.Reflection.Assembly.GetExecutingAssembly().CodeBase
-        Dim programFile As String = programPath.Substring(programPath.LastIndexOf("/") +1)
-        If My.Computer.Info.OSPlatform = "Unix" Then
-            programFile = "mono " & programFile
-        End If
-        Console.WriteLine("Usage: " & programFile & flags)
     End Sub
 End Module
