@@ -15,7 +15,7 @@ Imports System.Reflection
 
 Module Program
     Function WriteUsage(Optional input As String = Nothing) As Boolean
-        Console.Error.WriteLine("Usage: " & GetProgramFileName() & " [OPTION] <FILE>")
+        Console.Error.WriteLine("Usage: " & GetProgramFileName() & " [OPTION] <FILE...>")
         Console.Error.WriteLine("Gets the compressed size of a file (WalkmanUtils - https://github.com/Walkman100/WalkmanUtils)" & Environment.NewLine)
         WalkmanLib.EchoHelp(flagDict, input)
         Environment.Exit(0)
@@ -30,8 +30,40 @@ Module Program
             .optionalArgs = True,
             .argsInfo = "[flag]",
             .action = AddressOf WriteUsage
+        }},
+        {"files", New WalkmanLib.FlagInfo With {
+            .shortFlag = "f"c,
+            .description = "Print file name before size",
+            .hasArgs = False,
+            .action = Function() DoAndReturn(Sub() printFileNames = True)
         }}
     }
+
+    Private printFileNames As Boolean = False
+
+    Private Sub WriteFileSizes(files As List(Of String))
+        For Each file As String In files
+            If IO.File.Exists(file) Then
+                file = IO.Path.GetFullPath(file)
+                If printFileNames Then Console.Write(file & ": ")
+
+                Try
+                    Dim compressedSize As Double = WalkmanLib.GetCompressedSize(file)
+                    Console.WriteLine(compressedSize)
+                Catch ex As IO.IOException
+                    If Console.IsOutputRedirected Then Console.WriteLine("?")
+                    Console.Error.WriteLine("Exception getting compressed size: " & ex.Message)
+                End Try
+            Else
+                If Console.IsOutputRedirected Then
+                    If printFileNames Then Console.Write(file & ": ")
+                    Console.WriteLine("?")
+                End If
+
+                Console.Error.WriteLine("File """ & file & """ not found!")
+            End If
+        Next
+    End Sub
 
     Sub Main(args() As String)
         Dim res As WalkmanLib.ResultInfo = WalkmanLib.ProcessArgs(args, flagDict, True)
@@ -40,22 +72,8 @@ Module Program
             ExitE(res.errorInfo)
         ElseIf res.extraParams.Count < 1 Then
             WriteUsage()
-
         Else
-            For Each file As String In res.extraParams
-                If IO.File.Exists(file) Then
-                    Try
-                        Dim compressedSize As Double = WalkmanLib.GetCompressedSize(file)
-                        Console.WriteLine(compressedSize)
-                    Catch ex As IO.IOException
-                        If Console.IsOutputRedirected Then Console.WriteLine("?")
-                        Console.Error.WriteLine("Exception getting compressed size: " & ex.Message)
-                    End Try
-                Else
-                    If Console.IsOutputRedirected Then Console.WriteLine("?")
-                    Console.Error.WriteLine("File """ & file & """ not found!")
-                End If
-            Next
+            WriteFileSizes(res.extraParams)
         End If
     End Sub
 End Module
