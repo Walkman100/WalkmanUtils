@@ -4,36 +4,72 @@ Option Compare Binary
 Option Infer Off
 
 Imports System
+Imports System.Collections.Generic
 Imports System.Reflection
 
-<assembly: AssemblyTitle("GetFolderIcon")>
-<assembly: AssemblyDescription("")>
-<assembly: AssemblyConfiguration("")>
-<assembly: AssemblyCompany("")>
-<assembly: AssemblyProduct("GetFolderIcon")>
+<Assembly: AssemblyTitle("GetFolderIcon")>
+<Assembly: AssemblyDescription("")>
+<Assembly: AssemblyConfiguration("")>
+<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyProduct("GetFolderIcon")>
 
 Module Program
-    Sub Main(args() As String)
-        If args.Length <> 1 Then
-            WriteUsage
-        ElseIf IO.Directory.Exists(args(0)) Then
-            Dim folderPath As String = args(0)
-            If folderPath.EndsWith(IO.Path.VolumeSeparatorChar) Then folderPath &= IO.Path.DirectorySeparatorChar
-            
-            Console.WriteLine(WalkmanLib.GetFolderIconPath(folderPath))
-        Else
-            Console.WriteLine("Folder """ & args(0) & """ not found!")
-            WriteUsage
-        End If
+    Function WriteUsage(Optional input As String = Nothing) As Boolean
+        Console.Error.WriteLine("Usage: " & GetProgramFileName() & " [OPTION] <FOLDER...>")
+        Console.Error.WriteLine("Get the path to a folder icon, or ""no icon found"" if none is set " &
+                                "(WalkmanUtils - https://github.com/Walkman100/WalkmanUtils)" & Environment.NewLine)
+        WalkmanLib.EchoHelp(flagDict, input)
+        Environment.Exit(0)
+        Return True
+    End Function
+
+    Private flagDict As New Dictionary(Of String, WalkmanLib.FlagInfo) From {
+        {"help", New WalkmanLib.FlagInfo With {
+            .shortFlag = "h"c,
+            .description = "Show Help",
+            .hasArgs = True,
+            .optionalArgs = True,
+            .argsInfo = "[flag]",
+            .action = AddressOf WriteUsage
+        }},
+        {"folders", New WalkmanLib.FlagInfo With {
+            .shortFlag = "f"c,
+            .description = "Print folder name before icon path",
+            .hasArgs = False,
+            .action = Function() DoAndReturn(Sub() printFolderPaths = True)
+        }}
+    }
+
+    Private printFolderPaths As Boolean = False
+
+    Private Sub WriteFolderIconPaths(folders As List(Of String))
+        For Each folder As String In folders
+            If IO.Directory.Exists(folder) Then
+                If folder.EndsWith(IO.Path.VolumeSeparatorChar) Then folder &= IO.Path.DirectorySeparatorChar
+                folder = IO.Path.GetFullPath(folder)
+
+                If printFolderPaths Then Console.Write(folder & ": ")
+                Console.WriteLine(WalkmanLib.GetFolderIconPath(folder))
+            Else
+                If Console.IsOutputRedirected Then
+                    If printFolderPaths Then Console.Write(folder & ": ")
+                    Console.WriteLine("Path not found")
+                End If
+
+                Console.Error.WriteLine("Folder """ & folder & """ not found!")
+            End If
+        Next
     End Sub
-    
-    Sub WriteUsage()
-        Dim flags As String = " <folder path>" & Environment.NewLine & "Get the path to a folder icon, or ""no icon found"" if none is set (WalkmanUtils - https://github.com/Walkman100/WalkmanUtils)"
-        Dim programPath As String = System.Reflection.Assembly.GetExecutingAssembly().CodeBase
-        Dim programFile As String = programPath.Substring(programPath.LastIndexOf("/") +1)
-        If My.Computer.Info.OSPlatform = "Unix" Then
-            programFile = "mono " & programFile
+
+    Sub Main(args() As String)
+        Dim res As WalkmanLib.ResultInfo = WalkmanLib.ProcessArgs(args, flagDict, True)
+
+        If res.gotError Then
+            ExitE(res.errorInfo)
+        ElseIf res.extraParams.Count < 1 Then
+            WriteUsage()
+        Else
+            WriteFolderIconPaths(res.extraParams)
         End If
-        Console.WriteLine("Usage: " & programFile & flags)
     End Sub
 End Module

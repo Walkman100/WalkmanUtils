@@ -33,19 +33,19 @@ Module Program
         }},
         {"files", New WalkmanLib.FlagInfo With {
             .shortFlag = "f"c,
-            .description = "Print file name before size",
+            .description = "Print file path before size",
             .hasArgs = False,
-            .action = Function() DoAndReturn(Sub() printFileNames = True)
+            .action = Function() DoAndReturn(Sub() printFilePaths = True)
         }}
     }
 
-    Private printFileNames As Boolean = False
+    Private printFilePaths As Boolean = False
 
     Private Sub WriteFileSizes(files As List(Of String))
         For Each file As String In files
             If IO.File.Exists(file) Then
                 file = IO.Path.GetFullPath(file)
-                If printFileNames Then Console.Write(file & ": ")
+                If printFilePaths Then Console.Write(file & ": ")
 
                 Try
                     Dim compressedSize As Double = WalkmanLib.GetCompressedSize(file)
@@ -56,7 +56,7 @@ Module Program
                 End Try
             Else
                 If Console.IsOutputRedirected Then
-                    If printFileNames Then Console.Write(file & ": ")
+                    If printFilePaths Then Console.Write(file & ": ")
                     Console.WriteLine("?")
                 End If
 
