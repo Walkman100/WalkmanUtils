@@ -16,8 +16,8 @@ Imports System.Reflection
 Module Program
     Function WriteUsage(Optional input As String = Nothing) As Boolean
         Console.Error.WriteLine("Usage: " & GetProgramFileName() & " [OPTION] <FILE...>")
-        Console.Error.WriteLine("Get the path to the program specified to open a file, or ""Filetype not associated!"" if none is set " &
-                                "(WalkmanUtils - https://github.com/Walkman100/WalkmanUtils)" & Environment.NewLine)
+        Console.Error.WriteLine("Get the path to the program specified to open a file, or ""Filetype not associated!"" if none is set" &
+                                WalkmanUtilsText & Environment.NewLine)
         WalkmanLib.EchoHelp(flagDict, input)
         Environment.Exit(0)
         Return True

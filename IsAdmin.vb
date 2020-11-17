@@ -4,30 +4,43 @@ Option Compare Binary
 Option Infer Off
 
 Imports System
+Imports System.Collections.Generic
 Imports System.Reflection
 
-<assembly: AssemblyTitle("IsAdmin")>
-<assembly: AssemblyDescription("")>
-<assembly: AssemblyConfiguration("")>
-<assembly: AssemblyCompany("")>
-<assembly: AssemblyProduct("IsAdmin")>
+<Assembly: AssemblyTitle("IsAdmin")>
+<Assembly: AssemblyDescription("")>
+<Assembly: AssemblyConfiguration("")>
+<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyProduct("IsAdmin")>
 
 Module Program
+    Function WriteUsage(Optional input As String = Nothing) As Boolean
+        Console.Error.WriteLine("Usage: " & GetProgramFileName() & " [OPTION]")
+        Console.Error.WriteLine("Checks whether the current process is elevated (running with administrator permissions). Outputs True if running with administrator permissions, False if not" &
+                                WalkmanUtilsText & Environment.NewLine)
+        WalkmanLib.EchoHelp(flagDict, input)
+        Environment.Exit(0)
+        Return True
+    End Function
+
+    Private flagDict As New Dictionary(Of String, WalkmanLib.FlagInfo) From {
+        {"help", New WalkmanLib.FlagInfo With {
+            .shortFlag = "h"c,
+            .description = "Show Help",
+            .hasArgs = True,
+            .optionalArgs = True,
+            .argsInfo = "[flag]",
+            .action = AddressOf WriteUsage
+        }}
+    }
+
     Sub Main(args() As String)
-        If args.Length <> 0 Then
-            WriteUsage
+        Dim res As WalkmanLib.ResultInfo = WalkmanLib.ProcessArgs(args, flagDict)
+
+        If res.gotError Then
+            ExitE(res.errorInfo)
         Else
-            Console.WriteLine(WalkmanLib.IsAdmin)
+            Console.WriteLine(WalkmanLib.IsAdmin())
         End If
-    End Sub
-    
-    Sub WriteUsage()
-        Dim flags As String = Environment.NewLine & "Checks whether the current process is elevated (running with administrator permissions). Outputs True if running with administrator permissions, False if not (WalkmanUtils - https://github.com/Walkman100/WalkmanUtils)"
-        Dim programPath As String = System.Reflection.Assembly.GetExecutingAssembly().CodeBase
-        Dim programFile As String = programPath.Substring(programPath.LastIndexOf("/") +1)
-        If My.Computer.Info.OSPlatform = "Unix" Then
-            programFile = "mono " & programFile
-        End If
-        Console.WriteLine("Usage: " & programFile & flags)
     End Sub
 End Module

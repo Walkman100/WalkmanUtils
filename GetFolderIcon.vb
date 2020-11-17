@@ -16,8 +16,8 @@ Imports System.Reflection
 Module Program
     Function WriteUsage(Optional input As String = Nothing) As Boolean
         Console.Error.WriteLine("Usage: " & GetProgramFileName() & " [OPTION] <FOLDER...>")
-        Console.Error.WriteLine("Get the path to a folder icon, or ""no icon found"" if none is set " &
-                                "(WalkmanUtils - https://github.com/Walkman100/WalkmanUtils)" & Environment.NewLine)
+        Console.Error.WriteLine("Get the path to a folder icon, or ""no icon found"" if none is set" &
+                                WalkmanUtilsText & Environment.NewLine)
         WalkmanLib.EchoHelp(flagDict, input)
         Environment.Exit(0)
         Return True

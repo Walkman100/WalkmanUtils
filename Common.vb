@@ -28,6 +28,8 @@ Public Module Common
         End If
     End Function
 
+    Public Const WalkmanUtilsText As String = " (WalkmanUtils - https://github.com/Walkman100/WalkmanUtils)"
+
     Public Function GetProgramFileName() As String
         Dim programPath As String = Reflection.Assembly.GetExecutingAssembly().CodeBase
         Dim programFile As String = IO.Path.GetFileName(programPath)

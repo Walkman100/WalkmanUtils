@@ -16,7 +16,7 @@ Imports System.Reflection
 Module Program
     Function WriteUsage(Optional input As String = Nothing) As Boolean
         Console.Error.WriteLine("Usage: " & GetProgramFileName() & " [OPTION] <FILE...>")
-        Console.Error.WriteLine("Gets the compressed size of a file (WalkmanUtils - https://github.com/Walkman100/WalkmanUtils)" & Environment.NewLine)
+        Console.Error.WriteLine("Gets the compressed size of a file" & WalkmanUtilsText & Environment.NewLine)
         WalkmanLib.EchoHelp(flagDict, input)
         Environment.Exit(0)
         Return True
