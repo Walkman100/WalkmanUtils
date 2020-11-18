@@ -18,7 +18,8 @@ Imports System.Reflection
 Module Program
     Function WriteUsage(Optional input As String = Nothing) As Boolean
         Console.Error.WriteLine("Usage: " & GetProgramFileName() & " [OPTION] <FILE...>")
-        Console.Error.WriteLine("Sets the provided attributes to all items specified" & WalkmanUtilsText & Environment.NewLine)
+        Console.Error.WriteLine("Sets the provided attributes to all items specified" & WalkmanUtilsText)
+        Console.Error.WriteLine("The attribute flags will set the attribute if the argument is not provided - use '--' to end argument parsing" & Environment.NewLine)
         WalkmanLib.EchoHelp(flagDict, input)
         Environment.Exit(0)
         Return True
@@ -35,7 +36,7 @@ Module Program
         }},
         {"quiet", New WalkmanLib.FlagInfo With {
             .shortFlag = "q"c,
-            .description = "Don't output whether setting attributes succeeded or failed",
+            .description = "Don't output whether setting attributes succeeded or failed. Overrides --files",
             .action = Function() DoAndReturn(Sub() QuietOutput = True)
         }},
         {"files", New WalkmanLib.FlagInfo With {
@@ -115,6 +116,14 @@ Module Program
             .argsInfo = AllowedValues,
             .action = Function(input As String) DoAndReturn(Sub() Encrypted = GetSetMode(input))
         }},
+        {"Encrypt", New WalkmanLib.FlagInfo With {
+            .shortFlag = "E"c,
+            .description = "Run the system Encrypt or Decrypt function on the path - only works for files",
+            .hasArgs = True,
+            .optionalArgs = True,
+            .argsInfo = AllowedValues,
+            .action = Function(input As String) DoAndReturn(Sub() PerformEncrypt = GetSetMode(input))
+        }},
         {"IntegrityStream", New WalkmanLib.FlagInfo With {
             .shortFlag = "i"c,
             .description = "Set or Unset the IntegrityStream flag",
@@ -150,6 +159,7 @@ Module Program
     Private Offline As SetMode
     Private NotContentIndexed As SetMode
     Private Encrypted As SetMode
+    Private PerformEncrypt As SetMode
     Private IntegrityStream As SetMode
     Private NoScrubData As SetMode
 
@@ -175,27 +185,32 @@ Module Program
         For Each file As String In files
             If IO.File.Exists(file) Then
                 file = Path.GetFullPath(file)
-                If PrintFilePaths Then Console.Write(file & ": ")
+                If Not QuietOutput AndAlso PrintFilePaths Then Console.Write(file & ": ")
 
-                Dim rtn As Boolean
+                Dim rtn As Boolean = True
 
-                If [ReadOnly] <> SetMode.None Then rtn = WalkmanLib.ChangeAttribute(file, FileAttributes.ReadOnly, [ReadOnly] = SetMode.Set)
-                If Hidden <> SetMode.None Then rtn = WalkmanLib.ChangeAttribute(file, FileAttributes.Hidden, Hidden = SetMode.Set)
-                If System <> SetMode.None Then rtn = WalkmanLib.ChangeAttribute(file, FileAttributes.System, System = SetMode.Set)
-                If Archive <> SetMode.None Then rtn = WalkmanLib.ChangeAttribute(file, FileAttributes.Archive, Archive = SetMode.Set)
-                If Normal <> SetMode.None Then rtn = WalkmanLib.ChangeAttribute(file, FileAttributes.Normal, Normal = SetMode.Set)
-                If Temporary <> SetMode.None Then rtn = WalkmanLib.ChangeAttribute(file, FileAttributes.Temporary, Temporary = SetMode.Set)
-                If Offline <> SetMode.None Then rtn = WalkmanLib.ChangeAttribute(file, FileAttributes.Offline, Offline = SetMode.Set)
-                If NotContentIndexed <> SetMode.None Then rtn = WalkmanLib.ChangeAttribute(file, FileAttributes.NotContentIndexed, NotContentIndexed = SetMode.Set)
-                If Encrypted <> SetMode.None Then rtn = WalkmanLib.ChangeAttribute(file, FileAttributes.Encrypted, Encrypted = SetMode.Set)
-                If IntegrityStream <> SetMode.None Then rtn = WalkmanLib.ChangeAttribute(file, FileAttributes.IntegrityStream, IntegrityStream = SetMode.Set)
-                If NoScrubData <> SetMode.None Then rtn = WalkmanLib.ChangeAttribute(file, FileAttributes.NoScrubData, NoScrubData = SetMode.Set)
+                If [ReadOnly] <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.ReadOnly, [ReadOnly] = SetMode.Set) Then rtn = False
+                If Hidden <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Hidden, Hidden = SetMode.Set) Then rtn = False
+                If System <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.System, System = SetMode.Set) Then rtn = False
+                If Archive <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Archive, Archive = SetMode.Set) Then rtn = False
+                If Normal <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Normal, Normal = SetMode.Set) Then rtn = False
+                If Temporary <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Temporary, Temporary = SetMode.Set) Then rtn = False
+                If Offline <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Offline, Offline = SetMode.Set) Then rtn = False
+                If NotContentIndexed <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.NotContentIndexed, NotContentIndexed = SetMode.Set) Then rtn = False
+                If Encrypted <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Encrypted, Encrypted = SetMode.Set) Then rtn = False
+                If IntegrityStream <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.IntegrityStream, IntegrityStream = SetMode.Set) Then rtn = False
+                If NoScrubData <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.NoScrubData, NoScrubData = SetMode.Set) Then rtn = False
 
-                If Not QuietOutput Then Console.Write(rtn)
+                Try
+                    If PerformEncrypt = SetMode.Set Then IO.File.Encrypt(file)
+                    If PerformEncrypt = SetMode.Unset Then IO.File.Decrypt(file)
+                Catch
+                    rtn = False
+                End Try
 
-                Console.WriteLine()
+                If Not QuietOutput Then Console.WriteLine(rtn)
             Else
-                If Console.IsOutputRedirected Then
+                If Not QuietOutput AndAlso Console.IsOutputRedirected Then
                     If PrintFilePaths Then Console.Write(file & ": ")
                     Console.WriteLine("?")
                 End If
