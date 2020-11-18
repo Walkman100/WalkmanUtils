@@ -34,7 +34,6 @@ Module Program
         {"files", New WalkmanLib.FlagInfo With {
             .shortFlag = "f"c,
             .description = "Print file path before size",
-            .hasArgs = False,
             .action = Function() DoAndReturn(Sub() printFilePaths = True)
         }}
     }
