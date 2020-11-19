@@ -189,17 +189,17 @@ Module Program
 
                 Dim rtn As Boolean = True
 
-                If [ReadOnly] <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.ReadOnly, [ReadOnly] = SetMode.Set) Then rtn = False
-                If Hidden <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Hidden, Hidden = SetMode.Set) Then rtn = False
-                If System <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.System, System = SetMode.Set) Then rtn = False
-                If Archive <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Archive, Archive = SetMode.Set) Then rtn = False
-                If Normal <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Normal, Normal = SetMode.Set) Then rtn = False
-                If Temporary <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Temporary, Temporary = SetMode.Set) Then rtn = False
-                If Offline <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Offline, Offline = SetMode.Set) Then rtn = False
+                If [ReadOnly] <> SetMode.None Then        If Not WalkmanLib.ChangeAttribute(file, FileAttributes.ReadOnly,                 [ReadOnly] = SetMode.Set) Then rtn = False
+                If Hidden <> SetMode.None Then            If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Hidden,                       Hidden = SetMode.Set) Then rtn = False
+                If System <> SetMode.None Then            If Not WalkmanLib.ChangeAttribute(file, FileAttributes.System,                       System = SetMode.Set) Then rtn = False
+                If Archive <> SetMode.None Then           If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Archive,                     Archive = SetMode.Set) Then rtn = False
+                If Normal <> SetMode.None Then            If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Normal,                       Normal = SetMode.Set) Then rtn = False
+                If Temporary <> SetMode.None Then         If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Temporary,                 Temporary = SetMode.Set) Then rtn = False
+                If Offline <> SetMode.None Then           If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Offline,                     Offline = SetMode.Set) Then rtn = False
                 If NotContentIndexed <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.NotContentIndexed, NotContentIndexed = SetMode.Set) Then rtn = False
-                If Encrypted <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Encrypted, Encrypted = SetMode.Set) Then rtn = False
-                If IntegrityStream <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.IntegrityStream, IntegrityStream = SetMode.Set) Then rtn = False
-                If NoScrubData <> SetMode.None Then If Not WalkmanLib.ChangeAttribute(file, FileAttributes.NoScrubData, NoScrubData = SetMode.Set) Then rtn = False
+                If Encrypted <> SetMode.None Then         If Not WalkmanLib.ChangeAttribute(file, FileAttributes.Encrypted,                 Encrypted = SetMode.Set) Then rtn = False
+                If IntegrityStream <> SetMode.None Then   If Not WalkmanLib.ChangeAttribute(file, FileAttributes.IntegrityStream,     IntegrityStream = SetMode.Set) Then rtn = False
+                If NoScrubData <> SetMode.None Then       If Not WalkmanLib.ChangeAttribute(file, FileAttributes.NoScrubData,             NoScrubData = SetMode.Set) Then rtn = False
 
                 Try
                     If PerformEncrypt = SetMode.Set Then IO.File.Encrypt(file)
