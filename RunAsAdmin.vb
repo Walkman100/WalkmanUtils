@@ -45,8 +45,15 @@ Class RunAsAdmin
             .optionalArgs = True,
             .argsInfo = "[flag]",
             .action = AddressOf ShowUsage
+        }},
+        {"noquotes", New WalkmanLib.FlagInfo With {
+            .shortFlag = "q"c,
+            .description = "Don't add quotes to program arguments",
+            .action = Function() DoAndReturn(Sub() noQuotes = True)
         }}
     }
+
+    Private noQuotes As Boolean = False
 
     Private Sub DoRunAsAdmin(args As List(Of String))
         Dim f As String = args(0)
@@ -58,7 +65,11 @@ Class RunAsAdmin
             Else
                 Dim arguments As String = ""
                 For i As Integer = 1 To args.Count - 1
-                    arguments &= args(i) & " "
+                    If noQuotes Then
+                        arguments &= args(i) & " "
+                    Else
+                        arguments &= """" & args(i) & """" & " "
+                    End If
                 Next
                 arguments = arguments.Remove(arguments.Length - 1) ' to get rid of the extra space at the end
 
