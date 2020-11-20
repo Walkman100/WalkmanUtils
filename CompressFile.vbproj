@@ -52,9 +52,14 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CompressFile.vb" />
+    <Compile Include="Common.vb" />
+    <Compile Include="CompressFile.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Properties\Application.vb" />
     <Compile Include="Properties\AssemblyInfo.vb" />
+    <Compile Include="WalkmanLib\WalkmanLibArgHandler.vb" />
+    <Compile Include="WalkmanLib\WalkmanLibDotNet.vb" />
     <Compile Include="WalkmanLib\WalkmanLibWin32.vb" />
   </ItemGroup>
   <ItemGroup>
