@@ -4,47 +4,77 @@ Option Compare Binary
 Option Infer Off
 
 Imports System
+Imports System.Collections.Generic
+Imports System.Linq
 Imports System.Reflection
 Imports System.Windows.Forms
-Imports Microsoft.VisualBasic
-Imports Microsoft.VisualBasic.ApplicationServices
 
-<assembly: AssemblyTitle("TakeOwn")>
-<assembly: AssemblyDescription("")>
-<assembly: AssemblyConfiguration("")>
-<assembly: AssemblyCompany("")>
-<assembly: AssemblyProduct("TakeOwn")>
+<Assembly: AssemblyTitle("TakeOwn")>
+<Assembly: AssemblyDescription("")>
+<Assembly: AssemblyConfiguration("")>
+<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyProduct("TakeOwn")>
 
 Class TakeOwn
-    Inherits System.Windows.Forms.Form
+    Inherits Form
+
+    Function GetUsage(Optional input As String = Nothing) As String
+        Dim usageText As String = "Usage: " & GetProgramFileName() & " <FILE...>" & Environment.NewLine
+        usageText &= "Take Ownership of a file or recursively Take Ownership of a folder" & WalkmanUtilsText & Environment.NewLine & Environment.NewLine
+
+        Using sw As New IO.StringWriter
+            WalkmanLib.EchoHelp(flagDict, input, sw)
+            usageText &= sw.ToString()
+        End Using
+
+        Return usageText
+    End Function
+
+    Function ShowUsage(Optional input As String = Nothing) As Boolean
+        MessageBox.Show(GetUsage(input), "Program Usage", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Environment.Exit(0)
+        Return True
+    End Function
+
+    Private flagDict As New Dictionary(Of String, WalkmanLib.FlagInfo) From {
+        {"help", New WalkmanLib.FlagInfo With {
+            .shortFlag = "h"c,
+            .description = "Show Help",
+            .hasArgs = True,
+            .optionalArgs = True,
+            .argsInfo = "[flag]",
+            .action = AddressOf ShowUsage
+        }}
+    }
+
+    Private Sub DoTakeOwn(paths As List(Of String))
+        For Each path As String In paths
+            If WalkmanLib.IsFileOrDirectory(path).HasFlag(PathEnum.Exists) Then
+                path = IO.Path.GetFullPath(path)
+                WalkmanLib.TakeOwnership(path)
+            Else
+                MessageBox.Show("Path """ & path & """ not found!", "Path not found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+            End If
+        Next
+    End Sub
+
     Public Sub New()
-        Dim args As String() = System.Environment.GetCommandLineArgs()
-        If args.Length <> 2 Then
-            Application.EnableVisualStyles()
-            MsgBox(GetUsage(), MsgBoxStyle.Information, "Command line arguments incorrect")
-        ElseIf IO.File.Exists(args(1)) Or IO.Directory.Exists(args(1)) Then
-            WalkmanLib.TakeOwnership(args(1))
+        Dim args As String() = Environment.GetCommandLineArgs().Skip(1).ToArray()
+        Dim res As WalkmanLib.ResultInfo = WalkmanLib.ProcessArgs(args, flagDict, True)
+
+        If res.gotError Then
+            MessageBox.Show(res.errorInfo, "Error processing arguments", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        ElseIf res.extraParams.Count < 1 Then
+            ShowUsage()
         Else
-            Application.EnableVisualStyles()
-            MsgBox("File or directory """ & args(1) & """ not found!" & Environment.NewLine & Environment.NewLine & GetUsage(), MsgBoxStyle.Exclamation, "Path not found")
+            DoTakeOwn(res.extraParams)
         End If
-        
+
         Do Until 0 <> 0
-            Application.Exit
+            Application.Exit()
             End
         Loop
     End Sub
-    
-    Function GetUsage() As String
-        Dim flags As String = " <path>" & Environment.NewLine & "Take Ownership of a file or recursively Take Ownership of a folder"
-        flags &= Environment.NewLine & "WalkmanUtils - https://github.com/Walkman100/WalkmanUtils"
-        Dim programPath As String = System.Reflection.Assembly.GetExecutingAssembly().CodeBase
-        Dim programFile As String = programPath.Substring(programPath.LastIndexOf("/") +1)
-        If My.Computer.Info.OSPlatform = "Unix" Then
-            programFile = "mono " & programFile
-        End If
-        Return "Usage: " & programFile & flags
-    End Function
 End Class
 
 Namespace My
