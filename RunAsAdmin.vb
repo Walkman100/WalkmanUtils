@@ -57,9 +57,7 @@ Class RunAsAdmin
 
     Private Sub DoRunAsAdmin(args As List(Of String))
         Dim f As String = args(0)
-        If File.Exists(f) Then
-            f = Path.GetFullPath(f)
-
+        Try
             If args.Count = 1 Then
                 WalkmanLib.RunAsAdmin(f)
             Else
@@ -75,9 +73,9 @@ Class RunAsAdmin
 
                 WalkmanLib.RunAsAdmin(f, arguments)
             End If
-        Else
-            MessageBox.Show("Executable """ & f & """ not found!", "Executable not found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-        End If
+        Catch ex As Exception
+            MessageBox.Show("Error launching """ & f & """: " & ex.Message, "Error running as Admin!", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+        End Try
     End Sub
 
     Public Sub New()
