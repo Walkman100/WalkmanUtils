@@ -4,56 +4,88 @@ Option Compare Binary
 Option Infer Off
 
 Imports System
+Imports System.Collections.Generic
+Imports System.IO
+Imports System.Linq
 Imports System.Reflection
 Imports System.Windows.Forms
-Imports Microsoft.VisualBasic
 
-<assembly: AssemblyTitle("RunAsAdmin")>
-<assembly: AssemblyDescription("")>
-<assembly: AssemblyConfiguration("")>
-<assembly: AssemblyCompany("")>
-<assembly: AssemblyProduct("RunAsAdmin")>
+<Assembly: AssemblyTitle("RunAsAdmin")>
+<Assembly: AssemblyDescription("")>
+<Assembly: AssemblyConfiguration("")>
+<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyProduct("RunAsAdmin")>
 
 Class RunAsAdmin
-    Inherits System.Windows.Forms.Form
-    Public Sub New()
-        Dim args As String() = System.Environment.GetCommandLineArgs()
-        If args.Length < 2 Then
-            Application.EnableVisualStyles()
-            MsgBox(GetUsage(), MsgBoxStyle.Information, "Command line arguments incorrect")
-        ElseIf IO.File.Exists(args(1)) Then
-            If args.Length = 2 Then
-                WalkmanLib.RunAsAdmin(args(1))
+    Inherits Form
+
+    Function GetUsage(Optional input As String = Nothing) As String
+        Dim usageText As String = "Usage: " & GetProgramFileName() & " <FILE> [ARGS...]" & Environment.NewLine
+        usageText &= "Starts a program with a set of command-line arguments as an administrator" & WalkmanUtilsText & Environment.NewLine & Environment.NewLine
+
+        Using sw As New StringWriter
+            WalkmanLib.EchoHelp(flagDict, input, sw)
+            usageText &= sw.ToString()
+        End Using
+
+        Return usageText
+    End Function
+
+    Function ShowUsage(Optional input As String = Nothing) As Boolean
+        MessageBox.Show(GetUsage(input), "Program Usage", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Environment.Exit(0)
+        Return True
+    End Function
+
+    Private flagDict As New Dictionary(Of String, WalkmanLib.FlagInfo) From {
+        {"help", New WalkmanLib.FlagInfo With {
+            .shortFlag = "h"c,
+            .description = "Show Help",
+            .hasArgs = True,
+            .optionalArgs = True,
+            .argsInfo = "[flag]",
+            .action = AddressOf ShowUsage
+        }}
+    }
+
+    Private Sub DoRunAsAdmin(args As List(Of String))
+        Dim f As String = args(0)
+        If File.Exists(f) Then
+            f = Path.GetFullPath(f)
+
+            If args.Count = 1 Then
+                WalkmanLib.RunAsAdmin(f)
             Else
                 Dim arguments As String = ""
-                For i As Integer = 2 To args.Length - 1
+                For i As Integer = 1 To args.Count - 1
                     arguments &= args(i) & " "
                 Next
                 arguments = arguments.Remove(arguments.Length - 1) ' to get rid of the extra space at the end
-                
-                WalkmanLib.RunAsAdmin(args(1), arguments)
+
+                WalkmanLib.RunAsAdmin(f, arguments)
             End If
         Else
-            Application.EnableVisualStyles()
-            MsgBox("Executable """ & args(1) & """ not found!" & Environment.NewLine & Environment.NewLine & GetUsage(), MsgBoxStyle.Exclamation, "Executable not found")
+            MessageBox.Show("Executable """ & f & """ not found!", "Executable not found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
         End If
-        
+    End Sub
+
+    Public Sub New()
+        Dim args As String() = Environment.GetCommandLineArgs().Skip(1).ToArray()
+        Dim res As WalkmanLib.ResultInfo = WalkmanLib.ProcessArgs(args, flagDict, True)
+
+        If res.gotError Then
+            MessageBox.Show(res.errorInfo, "Error processing arguments", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        ElseIf res.extraParams.Count < 1 Then
+            ShowUsage()
+        Else
+            DoRunAsAdmin(res.extraParams)
+        End If
+
         Do Until 0 <> 0
-            Application.Exit
+            Application.Exit()
             End
         Loop
     End Sub
-    
-    Function GetUsage() As String
-        Dim flags As String = " <path>" & Environment.NewLine & "Starts a program with a set of command-line arguments as an administrator"
-        flags &= Environment.NewLine & "WalkmanUtils - https://github.com/Walkman100/WalkmanUtils"
-        Dim programPath As String = System.Reflection.Assembly.GetExecutingAssembly().CodeBase
-        Dim programFile As String = programPath.Substring(programPath.LastIndexOf("/") +1)
-        If My.Computer.Info.OSPlatform = "Unix" Then
-            programFile = "mono " & programFile
-        End If
-        Return "Usage: " & programFile & flags
-    End Function
 End Class
 
 Namespace My
