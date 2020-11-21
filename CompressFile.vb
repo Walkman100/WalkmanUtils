@@ -48,17 +48,26 @@ Class CompressFile
     }
 
     Private Sub DoCompress(paths As List(Of String))
+        lblStatus.Text = "Starting..."
+
+        Dim allSucceeded As Boolean = True
+
         For Each path As String In paths
             If WalkmanLib.IsFileOrDirectory(path).HasFlag(PathEnum.Exists) Then
                 path = IO.Path.GetFullPath(path)
-                WalkmanLib.CompressFile(path)
-                MessageBox.Show("waiting...")
+
+                lblStatus.Text = "Compressing " & path & "..."
+                Dim rtn As Boolean = WalkmanLib.CompressFile(path)
+                lblStatus.Text = "Compressing " & path & " succeeded: " & rtn
+
+                If rtn = False Then allSucceeded = False
             Else
                 MessageBox.Show("Path """ & path & """ not found!", "Path not found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                allSucceeded = False
             End If
         Next
 
-
+        If Not allSucceeded Then MessageBox.Show("Some items failed to compress!", "Compressing items", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
 
         Me.Close()
         Application.Exit()
@@ -76,6 +85,10 @@ Class CompressFile
         Else
             pathList = res.extraParams
             Me.InitializeComponent()
+
+            ' MemoryStream used to create image must NOT be closed - https://stackoverflow.com/q/336387/2999220
+            Dim ms As New IO.MemoryStream(Convert.FromBase64String(loadingImageBase64))
+            pbxLoading.Image = Drawing.Image.FromStream(ms)
         End If
     End Sub
     Private pathList As List(Of String)
@@ -87,6 +100,21 @@ Class CompressFile
     Private Sub btnHide_Click() Handles btnHide.Click
         Me.Hide()
     End Sub
+
+    Private Const loadingImageBase64 As String =
+        "R0lGODlhEAAQALMPAHp6evf394qKiry8vJOTk83NzYKCgubm5t7e3qysrMXFxe7u7pubm7S0tKOjo///" &
+        "/yH/C05FVFNDQVBFMi4wAwEAAAAh+QQJCAAPACwAAAAAEAAQAAAETPDJSau9NRDAgWxDYGmdZADCkQnl" &
+        "U7CCOA3oNgXsQG2FRhUAAoWDIU6MGeSDR0m4ghRa7JjIUXCogqQzpRxYhi2HILsOGuJxGcNuTyIAIfkE" &
+        "CQgADwAsAAAAABAAEAAABGLwSXmMmjhLAQjSWDAYQHmAz8GVQPIESxZwggIYS0AIATYAvAdh8OIQJwRA" &
+        "QbJkdjAlUCA6KfU0VEmyGWgWnpNfcEAoAo6SmWtBUtCuk9gjwQKeQAeWYQAHIZICKBoKBncTEQAh+QQJ" &
+        "CAAPACwAAAAAEAAQAAAEWvDJORejGCtQsgwDAQAGGWSHMK7jgAWq0CGj0VEDIJxPnvAU0a13eAQKrsnI" &
+        "81gqAZ6AUzIonA7JRwFAyAQSgCQsjCmUAIhjDEhlrQTFV+lMGLApWwUzw1jsIwAh+QQJCAAPACwAAAAA" &
+        "EAAQAAAETvDJSau9L4QaBgEAMWgEQh0CqALCZ0pBKhRSkYLvM7Ab/OGThoE2+QExyAdiuexhVglKwdCg" &
+        "qKKTGGBgBc00Np7VcVsJDpVo5ydyJt/wCAAh+QQJCAAPACwAAAAAEAAQAAAEWvDJSau9OAwCABnBtQhd" &
+        "CQjHlQhFWJBCOKWPLAXk8KQIkCwWBcAgMDw4Q5CkgOwohCVCYTIwdAgPolVhWSQAiN1jcLLVQrQbrBV4" &
+        "EcySA8l0Alo0yA8cw+9TIgAh+QQFCAAPACwAAAAAEAAQAAAEWvDJSau9WA4AyAhWMChPwXHCQRUGYARg" &
+        "KQBCzJxAQgXzIC2KFkc1MREoHMTAhwQ0Y5oBgkMhAAqUw8mgWGho0EcCx5DwaAUQrGXATg6zE7bwCQ2s" &
+        "AGZmz7dEAAA7"
 
 #Region "Form Design"
     ''' <summary>
@@ -132,7 +160,7 @@ Class CompressFile
         '
         Me.btnHide.Anchor = System.Windows.Forms.AnchorStyles.Right
         Me.btnHide.DialogResult = System.Windows.Forms.DialogResult.Cancel
-        Me.btnHide.Location = New System.Drawing.Point(356, 9)
+        Me.btnHide.Location = New System.Drawing.Point(638, 9)
         Me.btnHide.Name = "btnHide"
         Me.btnHide.Size = New System.Drawing.Size(75, 23)
         Me.btnHide.TabIndex = 1
@@ -154,7 +182,7 @@ Class CompressFile
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.CancelButton = Me.btnHide
-        Me.ClientSize = New System.Drawing.Size(443, 40)
+        Me.ClientSize = New System.Drawing.Size(725, 40)
         Me.Controls.Add(Me.btnHide)
         Me.Controls.Add(Me.lblStatus)
         Me.Controls.Add(Me.pbxLoading)
