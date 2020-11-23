@@ -42,6 +42,9 @@
     <DefineConstants>TRACE=1</DefineConstants>
     <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>Properties\Compress.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -68,6 +71,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Properties\Compress.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>
