@@ -45,13 +45,26 @@ Class CompressFile
             .optionalArgs = True,
             .argsInfo = "[flag]",
             .action = AddressOf ShowUsage
+        }},
+        {"hidden", New WalkmanLib.FlagInfo With {
+            .shortFlag = "n"c,
+            .description = "Start window hidden",
+            .action = Function() DoAndReturn(Sub() hideWindow = True)
+        }},
+        {"quiet", New WalkmanLib.FlagInfo With {
+            .shortFlag = "q"c,
+            .description = "Don't show error messages",
+            .action = Function() DoAndReturn(Sub() showErrors = False)
         }}
     }
+
+    Private hideWindow As Boolean = False
+    Private showErrors As Boolean = True
 
     Private Sub DoCompress(sender As Object, e As DoWorkEventArgs) Handles bwCompress.DoWork
         Dim paths As List(Of String) = DirectCast(e.Argument, List(Of String))
 
-        lblStatus.Text = "Starting..."
+        SetStatus("Starting...")
 
         Dim allSucceeded As Boolean = True
 
@@ -59,27 +72,31 @@ Class CompressFile
             If WalkmanLib.IsFileOrDirectory(path).HasFlag(PathEnum.Exists) Then
                 path = IO.Path.GetFullPath(path)
 
-                lblStatus.Text = "Compressing " & path & "..."
+                SetStatus("Compressing " & path & "...")
                 Dim rtn As Boolean = WalkmanLib.CompressFile(path)
-                lblStatus.Text = "Compressing " & path & " succeeded: " & rtn
+                SetStatus("Compressing " & path & " succeeded: " & rtn)
 
                 If rtn = False Then allSucceeded = False
             Else
-                MessageBox.Show("Path """ & path & """ not found!", "Path not found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                If showErrors Then MessageBox.Show("Path """ & path & """ not found!", "Path not found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 allSucceeded = False
             End If
         Next
 
-        If Not allSucceeded Then MessageBox.Show("Some items failed to compress!", "Compressing items", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+        If Not allSucceeded AndAlso showErrors Then MessageBox.Show("Some items failed to compress!", "Compressing items", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+    End Sub
+    Private Sub SetStatus(text As String)
+        If lblStatus IsNot Nothing Then
+            lblStatus.Text = text
+        End If
     End Sub
     Private Sub bwCompress_WorkerCompleted(sender As Object, e As RunWorkerCompletedEventArgs) Handles bwCompress.RunWorkerCompleted
         If e.Error IsNot Nothing Then
-            WalkmanLib.ErrorDialog(e.Error)
-            lblStatus.Text = "Failed. Close window to exit"
+            If showErrors Then WalkmanLib.ErrorDialog(e.Error)
+            SetStatus("Failed. Close window to exit")
         Else
             Me.Close()
             Application.Exit()
-            'Environment.Exit(0)
         End If
     End Sub
 
@@ -92,6 +109,9 @@ Class CompressFile
             Environment.Exit(0) ' ShowUsage() below exits as well
         ElseIf res.extraParams.Count < 1 Then
             ShowUsage()
+        ElseIf hideWindow Then
+            DoCompress(Nothing, New DoWorkEventArgs(res.extraParams))
+            Environment.Exit(0)
         Else
             Me.InitializeComponent()
 
