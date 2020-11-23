@@ -5,6 +5,7 @@ Option Infer Off
 
 Imports System
 Imports System.Collections.Generic
+Imports System.ComponentModel
 Imports System.Linq
 Imports System.Reflection
 Imports System.Windows.Forms
@@ -47,7 +48,9 @@ Class CompressFile
         }}
     }
 
-    Private Sub DoCompress(paths As List(Of String))
+    Private Sub DoCompress(sender As Object, e As DoWorkEventArgs) Handles bwCompress.DoWork
+        Dim paths As List(Of String) = DirectCast(e.Argument, List(Of String))
+
         lblStatus.Text = "Starting..."
 
         Dim allSucceeded As Boolean = True
@@ -68,9 +71,16 @@ Class CompressFile
         Next
 
         If Not allSucceeded Then MessageBox.Show("Some items failed to compress!", "Compressing items", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
-
-        Me.Close()
-        Application.Exit()
+    End Sub
+    Private Sub bwCompress_WorkerCompleted(sender As Object, e As RunWorkerCompletedEventArgs) Handles bwCompress.RunWorkerCompleted
+        If e.Error IsNot Nothing Then
+            WalkmanLib.ErrorDialog(e.Error)
+            lblStatus.Text = "Failed. Close window to exit"
+        Else
+            Me.Close()
+            Application.Exit()
+            'Environment.Exit(0)
+        End If
     End Sub
 
     Public Sub New()
@@ -83,18 +93,14 @@ Class CompressFile
         ElseIf res.extraParams.Count < 1 Then
             ShowUsage()
         Else
-            pathList = res.extraParams
             Me.InitializeComponent()
 
             ' MemoryStream used to create image must NOT be closed - https://stackoverflow.com/q/336387/2999220
             Dim ms As New IO.MemoryStream(Convert.FromBase64String(loadingImageBase64))
             pbxLoading.Image = Drawing.Image.FromStream(ms)
-        End If
-    End Sub
-    Private pathList As List(Of String)
 
-    Private Sub CompressFile_Shown() Handles Me.Shown
-        DoCompress(pathList)
+            bwCompress.RunWorkerAsync(res.extraParams)
+        End If
     End Sub
 
     Private Sub btnHide_Click() Handles btnHide.Click
@@ -144,6 +150,7 @@ Class CompressFile
         Me.lblStatus = New System.Windows.Forms.Label()
         Me.btnHide = New System.Windows.Forms.Button()
         Me.pbxLoading = New System.Windows.Forms.PictureBox()
+        Me.bwCompress = New System.ComponentModel.BackgroundWorker()
         CType(Me.pbxLoading, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -176,6 +183,11 @@ Class CompressFile
         Me.pbxLoading.TabIndex = 2
         Me.pbxLoading.TabStop = False
         '
+        'bwCompress
+        '
+        Me.bwCompress.WorkerReportsProgress = True
+        Me.bwCompress.WorkerSupportsCancellation = True
+        '
         'CompressFile
         '
         Me.AcceptButton = Me.btnHide
@@ -197,6 +209,7 @@ Class CompressFile
     Friend WithEvents lblStatus As Label
     Friend WithEvents btnHide As Button
     Friend WithEvents pbxLoading As PictureBox
+    Friend WithEvents bwCompress As BackgroundWorker
 #End Region
 End Class
 
