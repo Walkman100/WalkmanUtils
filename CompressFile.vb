@@ -69,6 +69,7 @@ Class CompressFile
         Dim allSucceeded As Boolean = True
 
         For Each path As String In paths
+            If bwCompress.CancellationPending Then Exit For
             If WalkmanLib.IsFileOrDirectory(path).HasFlag(PathEnum.Exists) Then
                 path = IO.Path.GetFullPath(path)
 
@@ -81,6 +82,7 @@ Class CompressFile
                 If showErrors Then MessageBox.Show("Path """ & path & """ not found!", "Path not found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 allSucceeded = False
             End If
+            If bwCompress.CancellationPending Then Exit For
         Next
 
         If Not allSucceeded AndAlso showErrors Then MessageBox.Show("Some items failed to compress!", "Compressing items", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
@@ -129,6 +131,15 @@ Class CompressFile
 
     Private Sub btnHide_Click() Handles btnHide.Click
         Me.Hide()
+    End Sub
+
+    Private Sub CompressFile_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
+        If bwCompress.IsBusy Then
+            bwCompress.CancelAsync()
+            e.Cancel = True
+            MessageBox.Show("Further operations have been cancelled! Use the Hide button to hide this window",
+                            "Cancelling", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        End If
     End Sub
 
     Private Const loadingImageBase64 As String =
