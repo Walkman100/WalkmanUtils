@@ -103,7 +103,11 @@ Public Module MsgBoxCommon
         Dim text As String = String.Join(" ", args.ToArray())
         Dim result As DialogResult
 
-        result = MessageBox.Show(text, caption, buttons, icon, defaultButton, options, helpFile)
+        If helpFile Is Nothing Then
+            result = MessageBox.Show(text, caption, buttons, icon, defaultButton, options)
+        Else
+            result = MessageBox.Show(text, caption, buttons, icon, defaultButton, options, helpFile)
+        End If
 
         If outputNumber Then
             Console.WriteLine(DirectCast(result, Integer))

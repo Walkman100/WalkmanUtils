@@ -27,6 +27,7 @@ Module Program
         ElseIf res.extraParams.Count < 1 Then
             WriteUsage()
         Else
+            Windows.Forms.Application.EnableVisualStyles()
             DoMsgBox(res.extraParams)
         End If
     End Sub
