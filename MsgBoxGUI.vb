@@ -4,60 +4,47 @@ Option Compare Binary
 Option Infer Off
 
 Imports System
+Imports System.Linq
 Imports System.Reflection
+Imports System.Windows.Forms
 
-<assembly: AssemblyTitle("MsgBox_")>
-<assembly: AssemblyDescription("")>
-<assembly: AssemblyConfiguration("")>
-<assembly: AssemblyCompany("")>
-<assembly: AssemblyProduct("MsgBox_")>
+<Assembly: AssemblyTitle("MsgBoxGUI")>
+<Assembly: AssemblyDescription("")>
+<Assembly: AssemblyConfiguration("")>
+<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyProduct("MsgBoxGUI")>
+
+Module MsgBoxCommonCompat
+    Function WriteUsage(Optional input As String = Nothing) As Boolean
+        Return MsgBoxGUI.ShowUsage(input)
+    End Function
+End Module
 
 Class MsgBoxGUI
-    Inherits System.Windows.Forms.Form
-    
-    ''' <summary>
-    ''' Designer variable used to keep track of non-visual components.
-    ''' </summary>
-    Private components As System.ComponentModel.IContainer
-    
-    ''' <summary>
-    ''' Disposes resources used by the form.
-    ''' </summary>
-    ''' <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-    Protected Overrides Sub Dispose(ByVal disposing As Boolean)
-        If disposing Then
-            If components IsNot Nothing Then
-                components.Dispose()
-            End If
-        End If
-        MyBase.Dispose(disposing)
-    End Sub
-    
-    ''' <summary>
-    ''' This method is required for Windows Forms designer support.
-    ''' Do not change the method contents inside the source code editor. The Forms designer might
-    ''' not be able to load this method if it was changed manually.
-    ''' </summary>
-    Private Sub InitializeComponent()
-        Me.SuspendLayout
-        '
-        'MsgBoxGUI
-        '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6!, 13!)
-        Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(546, 125)
-        Me.Name = "MsgBoxGUI"
-        Me.Text = "MsgBoxGUI"
-        Me.ResumeLayout(false)
-    End Sub
-    
+    Inherits Form
+
+    Function ShowUsage(Optional input As String = Nothing) As Boolean
+        MessageBox.Show(GetUsage(input), "Program Usage", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Environment.Exit(0)
+        Return True
+    End Function
+
     Public Sub New()
-        ' The Me.InitializeComponent call is required for Windows Forms designer support.
-        Me.InitializeComponent()
-        
-        '
-        ' TODO : Add constructor code after InitializeComponents
-        '
+        Dim args As String() = Environment.GetCommandLineArgs().Skip(1).ToArray()
+        Dim res As WalkmanLib.ResultInfo = WalkmanLib.ProcessArgs(args, flagDict, True)
+
+        If res.gotError Then
+            MessageBox.Show(res.errorInfo, "Error processing arguments", MessageBoxButtons.OK, MessageBoxIcon.Error)
+        ElseIf res.extraParams.Count < 1 Then
+            ShowUsage()
+        Else
+            DoMsgBox(res.extraParams)
+        End If
+
+        Do Until 0 <> 0
+            Application.Exit()
+            End
+        Loop
     End Sub
 End Class
 

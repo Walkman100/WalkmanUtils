@@ -54,12 +54,16 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common.vb" />
+    <Compile Include="MsgBoxCommon.vb" />
     <Compile Include="MsgBoxGUI.vb" />
     <Compile Include="Properties\Application.vb" />
     <Compile Include="Properties\AssemblyInfo.vb" />
+    <Compile Include="WalkmanLib\WalkmanLibArgHandler.vb" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Properties" />
+    <Folder Include="WalkmanLib" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\App.config" />

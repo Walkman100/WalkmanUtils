@@ -6,19 +6,28 @@ Option Infer Off
 Imports System
 Imports System.Reflection
 
-<assembly: AssemblyTitle("MsgBox")>
-<assembly: AssemblyDescription("")>
-<assembly: AssemblyConfiguration("")>
-<assembly: AssemblyCompany("")>
-<assembly: AssemblyProduct("MsgBox")>
+<Assembly: AssemblyTitle("MsgBoxCMD")>
+<Assembly: AssemblyDescription("")>
+<Assembly: AssemblyConfiguration("")>
+<Assembly: AssemblyCompany("")>
+<Assembly: AssemblyProduct("MsgBoxCMD")>
 
 Module Program
-    Sub Main()
-        Console.WriteLine("Hello World!")
-        
-        ' TODO: Implement Functionality Here
-        
-        Console.Write("Press any key to continue . . . ")
-        Console.ReadKey(True)
+    Function WriteUsage(Optional input As String = Nothing) As Boolean
+        Console.Error.WriteLine(GetUsage(input))
+        Environment.Exit(0)
+        Return True
+    End Function
+
+    Sub Main(args() As String)
+        Dim res As WalkmanLib.ResultInfo = WalkmanLib.ProcessArgs(args, flagDict, True)
+
+        If res.gotError Then
+            ExitE(res.errorInfo)
+        ElseIf res.extraParams.Count < 1 Then
+            WriteUsage()
+        Else
+            DoMsgBox(res.extraParams)
+        End If
     End Sub
 End Module
