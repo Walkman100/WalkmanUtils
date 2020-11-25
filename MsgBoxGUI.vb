@@ -23,7 +23,7 @@ End Module
 Class MsgBoxGUI
     Inherits Form
 
-    Function ShowUsage(Optional input As String = Nothing) As Boolean
+    Shared Function ShowUsage(Optional input As String = Nothing) As Boolean
         MessageBox.Show(GetUsage(input), "Program Usage", MessageBoxButtons.OK, MessageBoxIcon.Information)
         Environment.Exit(0)
         Return True
