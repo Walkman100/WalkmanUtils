@@ -134,7 +134,7 @@ Class UncompressFile
     End Sub
 
     Private Sub UncompressFile_FormClosing(sender As Object, e As FormClosingEventArgs) Handles Me.FormClosing
-        If bwUncompress.IsBusy Then
+        If bwUncompress.IsBusy AndAlso e.CloseReason = CloseReason.UserClosing Then
             bwUncompress.CancelAsync()
             e.Cancel = True
             MessageBox.Show("Further operations have been cancelled! Use the Hide button to hide this window",
