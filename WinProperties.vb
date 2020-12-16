@@ -63,12 +63,13 @@ Class WinProperties
         For Each path As String In paths
             If IO.File.Exists(path) Or IO.Directory.Exists(path) Then
                 If WalkmanLib.ShowProperties(path, tabToShow) Then
+                    path = path.TrimEnd(IO.Path.DirectorySeparatorChar)
                     Dim itemName As String = IO.Path.GetFileName(path)
 
                     waitThreads.Add(Tasks.Task.Run(Sub()
                                                        Thread.Sleep(600)
                                                        MessageBox.Show("waiting for " & itemName & " started")
-                                                       WalkmanLib.WaitForWindowByThread(itemName & " Properties", "#32770")
+                                                       WalkmanLib.WaitForWindow(itemName & " Properties", "#32770")
                                                        MessageBox.Show("waiting for " & itemName & " finished")
                                                    End Sub))
                 Else
@@ -81,6 +82,7 @@ Class WinProperties
 
         Try
             Tasks.Task.WaitAll(waitThreads.ToArray())
+            Thread.Sleep(30000) ' wait for shell thread to exit completely
         Catch ex As AggregateException
             MessageBox.Show(ex.InnerException.ToString(), "Error waiting for one or more properties windows!", MessageBoxButtons.OK, MessageBoxIcon.Error)
         Catch ex As Exception
