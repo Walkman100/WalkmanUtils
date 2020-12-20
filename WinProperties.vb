@@ -8,6 +8,7 @@ Imports System.Collections.Generic
 Imports System.Linq
 Imports System.Reflection
 Imports System.Threading
+Imports System.Threading.Tasks
 Imports System.Windows.Forms
 
 <Assembly: AssemblyTitle("WinProperties")>
@@ -58,7 +59,7 @@ Class WinProperties
     Private tabToShow As String = Nothing
 
     Private Sub ShowProperties(paths As List(Of String))
-        Dim waitThreads As New List(Of Tasks.Task)
+        Dim waitThreads As New List(Of Task)
 
         For Each path As String In paths
             If IO.File.Exists(path) Or IO.Directory.Exists(path) Then
@@ -66,12 +67,12 @@ Class WinProperties
                     path = path.TrimEnd(IO.Path.DirectorySeparatorChar)
                     Dim itemName As String = IO.Path.GetFileName(path)
 
-                    waitThreads.Add(Tasks.Task.Run(Sub()
-                                                       Thread.Sleep(600)
-                                                       MessageBox.Show("waiting for " & itemName & " started")
-                                                       WalkmanLib.WaitForWindow(itemName & " Properties", "#32770")
-                                                       MessageBox.Show("waiting for " & itemName & " finished")
-                                                   End Sub))
+                    waitThreads.Add(Task.Run(Sub()
+                                                 Thread.Sleep(600)
+                                                 MessageBox.Show("waiting for " & itemName & " started")
+                                                 WalkmanLib.WaitForWindow(itemName & " Properties", "#32770")
+                                                 MessageBox.Show("waiting for " & itemName & " finished")
+                                             End Sub))
                 Else
                     MessageBox.Show("There was an error opening the properties window for """ & path & """!", "WinProperties", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 End If
@@ -81,7 +82,7 @@ Class WinProperties
         Next
 
         Try
-            Tasks.Task.WaitAll(waitThreads.ToArray())
+            Task.WaitAll(waitThreads.ToArray())
             Thread.Sleep(30000) ' wait for shell thread to exit completely
         Catch ex As AggregateException
             MessageBox.Show(ex.InnerException.ToString(), "Error waiting for one or more properties windows!", MessageBoxButtons.OK, MessageBoxIcon.Error)
