@@ -46,9 +46,21 @@ Class HandleManager
             .optionalArgs = True,
             .argsInfo = "[flag]",
             .action = AddressOf ShowUsage
+        }},
+        {"autoClose", New WalkmanLib.FlagInfo With {
+            .shortFlag = "a"c,
+            .description = "Automatically close all handles found",
+            .action = Function() DoAndReturn(Sub() autoClose = True)
+        }},
+        {"autoKill", New WalkmanLib.FlagInfo With {
+            .shortFlag = "k"c,
+            .description = "Automatically KILL ALL PROGRAMS FOUND",
+            .action = Function() DoAndReturn(Sub() autoKill = True)
         }}
     }
 
+    Private autoClose As Boolean = False
+    Private autoKill As Boolean = False
     Private currentPath As String = Nothing
 
     Public Sub New()
@@ -65,10 +77,12 @@ Class HandleManager
             currentPath = res.extraParams(0)
 
             Me.Text = "Processes using: " & currentPath
+        End If
+    End Sub
 
-            If Not bwHandleScan.IsBusy Then
-                btnScan_Click()
-            End If
+    Private Sub HandleManager_Shown() Handles Me.Shown
+        If Not bwHandleScan.IsBusy Then
+            btnScan_Click()
         End If
     End Sub
 
@@ -173,6 +187,11 @@ Class HandleManager
                 Dim tmpListViewItem As New ListViewItem({process.Id.ToString(), process.MainModule.FileName, "", ""})
                 lstHandles.Items.Add(tmpListViewItem)
             Next
+
+            If autoKill Then
+                lstHandles.Items.Cast(Of ListViewItem).ToList().ForEach(Sub(item) item.Selected = True)
+                btnKillProcess.PerformClick()
+            End If
         Catch ex As Exception When TypeOf ex.InnerException Is ComponentModel.Win32Exception
             ' ignore exceptions on folders - restart manager doesn't allow getting folder locks
         Catch ex As Exception
@@ -231,11 +250,19 @@ Class HandleManager
         End Try
 
         Dim tmpListviewItem As New ListViewItem({handleInfo.ProcessID.ToString(), processPath, "0x" & handleInfo.HandleID.ToString("x"), handleInfo.Name})
+        If autoKill OrElse autoClose Then tmpListviewItem.Selected = True
+
         lstHandles.Items.Add(tmpListviewItem)
 
         lstHandles.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize)
         lstHandles.Refresh()
         lstHandles_ItemSelectionChanged()
+
+        If autoKill Then
+            btnKillProcess.PerformClick()
+        ElseIf autoClose Then
+            btnCloseHandle.PerformClick()
+        End If
     End Sub
 
 #Region "Form Design"
