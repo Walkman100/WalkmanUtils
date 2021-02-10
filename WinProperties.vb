@@ -64,7 +64,9 @@ Class WinProperties
         For Each path As String In paths
             If IO.File.Exists(path) Or IO.Directory.Exists(path) Then
                 If WalkmanLib.ShowProperties(path, tabToShow) Then
-                    path = path.TrimEnd(IO.Path.DirectorySeparatorChar)
+                    ' in case . or .. is used        GetFileName returns empty string if path ends in directorySeparatorChar
+                    path = IO.Path.GetFullPath(path).TrimEnd(IO.Path.DirectorySeparatorChar)
+
                     Dim itemName As String = IO.Path.GetFileName(path)
 
                     waitThreads.Add(Task.Run(Sub()
@@ -74,10 +76,12 @@ Class WinProperties
                                                  MessageBox.Show("waiting for " & itemName & " finished")
                                              End Sub))
                 Else
-                    MessageBox.Show("There was an error opening the properties window for """ & path & """!", "WinProperties", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                    MessageBox.Show("There was an error opening the properties window for """ & path & """!",
+                                    "WinProperties", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
                 End If
             Else
-                MessageBox.Show("File or directory """ & path & """ not found!" & Environment.NewLine & Environment.NewLine & GetUsage(), "Path not found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
+                MessageBox.Show("File or directory """ & path & """ not found!" & Environment.NewLine & Environment.NewLine & GetUsage(),
+                                "Path not found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation)
             End If
         Next
 
