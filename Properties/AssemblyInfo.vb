@@ -7,7 +7,7 @@ Imports System.Reflection
 Imports System.Runtime.InteropServices
 
 ' Information about this assembly is defined by the following attributes.
-<Assembly: AssemblyCopyright("FOSS Walkman 2020")>
+<Assembly: AssemblyCopyright("FOSS Walkman 2020-21")>
 <Assembly: AssemblyTrademark("")>
 <Assembly: AssemblyCulture("")>
 
