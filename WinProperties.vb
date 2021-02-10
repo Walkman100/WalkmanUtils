@@ -62,18 +62,30 @@ Class WinProperties
         Dim waitThreads As New List(Of Task)
 
         For Each path As String In paths
-            If IO.File.Exists(path) Or IO.Directory.Exists(path) Then
+            If WalkmanLib.IsFileOrDirectory(path).HasFlag(PathEnum.Exists) Then
                 If WalkmanLib.ShowProperties(path, tabToShow) Then
+                    Dim itemName As String = Nothing
+
                     ' in case . or .. is used        GetFileName returns empty string if path ends in directorySeparatorChar
                     path = IO.Path.GetFullPath(path).TrimEnd(IO.Path.DirectorySeparatorChar)
 
-                    Dim itemName As String = IO.Path.GetFileName(path)
+                    If WalkmanLib.IsFileOrDirectory(path & IO.Path.DirectorySeparatorChar).HasFlag(PathEnum.IsDrive) Then
+                        ' handle drives separately.      ^ IsFileOrDirectory needs DirectorySeparatorChar to create fileinfo in the correct dir
+                        Dim driveLabel As String = Nothing
+                        Try
+                            driveLabel = New IO.DriveInfo(path).VolumeLabel
+                        Catch
+                            ' HACK: attempt to get label from type if getting label failed
+                            driveLabel = New IO.DriveInfo(path).DriveType.ToString()
+                        End Try
+                        itemName = "(" & path & ") " & driveLabel
+                    Else
+                        itemName = IO.Path.GetFileName(path)
+                    End If
 
                     waitThreads.Add(Task.Run(Sub()
                                                  Thread.Sleep(600)
-                                                 MessageBox.Show("waiting for " & itemName & " started")
                                                  WalkmanLib.WaitForWindow(itemName & " Properties", "#32770")
-                                                 MessageBox.Show("waiting for " & itemName & " finished")
                                              End Sub))
                 Else
                     MessageBox.Show("There was an error opening the properties window for """ & path & """!",
