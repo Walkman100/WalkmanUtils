@@ -119,36 +119,43 @@ Class HandleManager
         End If
     End Sub
 
+    Sub killProcess(item As ListViewItem)
+        Try
+            Diagnostics.Process.GetProcessById(Integer.Parse(item.SubItems(0).Text)).Kill()
+            item.Selected = False
+            item.ForeColor = Drawing.SystemColors.GrayText
+        Catch ex As Exception
+            WalkmanLib.ErrorDialog(ex)
+        End Try
+    End Sub
+    Sub closeHandle(item As ListViewItem)
+        If Not String.IsNullOrWhiteSpace(item.SubItems(0).Text) AndAlso Not String.IsNullOrWhiteSpace(item.SubItems(2).Text) Then
+            Try
+                Dim handleID As UShort = UShort.Parse(item.SubItems(2).Text.Substring(2), Globalization.NumberStyles.AllowHexSpecifier)
+
+                SystemHandles.CloseSystemHandle(UInteger.Parse(item.SubItems(0).Text), handleID)
+
+                item.Selected = False
+                item.ForeColor = Drawing.SystemColors.GrayText
+            Catch ex As Exception
+                WalkmanLib.ErrorDialog(ex)
+            End Try
+        End If
+    End Sub
+
     Sub btnKillProcess_Click() Handles btnKillProcess.Click
         If Not MessageBox.Show("Are you sure you want to kill the selected program(s)?", "Kill Process(es)",
                                MessageBoxButtons.YesNo, MessageBoxIcon.Question) = DialogResult.Yes Then
             Exit Sub
         End If
         For Each item As ListViewItem In lstHandles.SelectedItems
-            Try
-                Diagnostics.Process.GetProcessById(Integer.Parse(item.SubItems(0).Text)).Kill()
-                item.Selected = False
-                item.ForeColor = Drawing.SystemColors.GrayText
-            Catch ex As Exception
-                WalkmanLib.ErrorDialog(ex)
-            End Try
+            killProcess(item)
         Next
     End Sub
 
     Sub btnCloseHandle_Click() Handles btnCloseHandle.Click
         For Each item As ListViewItem In lstHandles.SelectedItems
-            If Not String.IsNullOrWhiteSpace(item.SubItems(0).Text) AndAlso Not String.IsNullOrWhiteSpace(item.SubItems(2).Text) Then
-                Try
-                    Dim handleID As UShort = UShort.Parse(item.SubItems(2).Text.Substring(2), Globalization.NumberStyles.AllowHexSpecifier)
-
-                    SystemHandles.CloseSystemHandle(UInteger.Parse(item.SubItems(0).Text), handleID)
-
-                    item.Selected = False
-                    item.ForeColor = Drawing.SystemColors.GrayText
-                Catch ex As Exception
-                    WalkmanLib.ErrorDialog(ex)
-                End Try
-            End If
+            closeHandle(item)
         Next
     End Sub
 
@@ -186,12 +193,11 @@ Class HandleManager
             For Each process As Diagnostics.Process In RestartManager.GetLockingProcesses(filePath)
                 Dim tmpListViewItem As New ListViewItem({process.Id.ToString(), process.MainModule.FileName, "", ""})
                 lstHandles.Items.Add(tmpListViewItem)
-            Next
 
-            If autoKill Then
-                lstHandles.Items.Cast(Of ListViewItem).ToList().ForEach(Sub(item) item.Selected = True)
-                btnKillProcess.PerformClick()
-            End If
+                If autoKill Then
+                    killProcess(tmpListViewItem)
+                End If
+            Next
         Catch ex As Exception When TypeOf ex.InnerException Is ComponentModel.Win32Exception
             ' ignore exceptions on folders - restart manager doesn't allow getting folder locks
         Catch ex As Exception
@@ -250,7 +256,6 @@ Class HandleManager
         End Try
 
         Dim tmpListviewItem As New ListViewItem({handleInfo.ProcessID.ToString(), processPath, "0x" & handleInfo.HandleID.ToString("x"), handleInfo.Name})
-        If autoKill OrElse autoClose Then tmpListviewItem.Selected = True
 
         lstHandles.Items.Add(tmpListviewItem)
 
@@ -259,9 +264,9 @@ Class HandleManager
         lstHandles_ItemSelectionChanged()
 
         If autoKill Then
-            btnKillProcess.PerformClick()
+            killProcess(tmpListviewItem)
         ElseIf autoClose Then
-            btnCloseHandle.PerformClick()
+            closeHandle(tmpListviewItem)
         End If
     End Sub
 
