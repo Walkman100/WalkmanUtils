@@ -42,7 +42,7 @@
     <DefineConstants>TRACE=1</DefineConstants>
     <BaseIntermediateOutputPath>obj\</BaseIntermediateOutputPath>
     <StartAction>Program</StartAction>
-    <StartProgram>bin\Release\MsgBox.com</StartProgram>
+    <StartProgram>$(TargetDir)MsgBox.com</StartProgram>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -68,6 +68,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <PostBuildEvent>move MsgBoxCMD.exe MsgBox.com</PostBuildEvent>
+    <PostBuildEvent>move "$(TargetPath)" "$(TargetDir)MsgBox.com"
+move "$(TargetPath).config" "$(TargetDir)MsgBox.com.config"</PostBuildEvent>
   </PropertyGroup>
 </Project>
