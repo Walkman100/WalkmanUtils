@@ -74,6 +74,10 @@ Class HandleManager
             ShowUsage()
         Else
             Me.InitializeComponent()
+            Try ' set form icon from EXE, but don't crash if it fails
+                Me.Icon = Drawing.Icon.ExtractAssociatedIcon(New Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath)
+            Catch : End Try
+
             currentPath = res.extraParams(0)
 
             Me.Text = "Processes using: " & currentPath
