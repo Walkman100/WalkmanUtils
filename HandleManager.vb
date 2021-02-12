@@ -202,7 +202,7 @@ Class HandleManager
                     killProcess(tmpListViewItem)
                 End If
             Next
-        Catch ex As Exception When TypeOf ex.InnerException Is ComponentModel.Win32Exception
+        Catch ex As Exception When TypeOf ex.InnerException Is System.ComponentModel.Win32Exception
             ' ignore exceptions on folders - restart manager doesn't allow getting folder locks
         Catch ex As Exception
             ' allow systemHandles code to run even if restartManager fails
