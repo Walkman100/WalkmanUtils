@@ -17,6 +17,12 @@ Public Module MsgBoxCommon
             usageText &= sw.ToString()
         End Using
 
+        usageText &= Environment.NewLine & "For values, see:"
+        usageText &= Environment.NewLine & "https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.messageboxbuttons?view=netframework-4.5.1#fields"
+        usageText &= Environment.NewLine & "https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.messageboxicon?view=netframework-4.5.1#fields"
+        usageText &= Environment.NewLine & "https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.messageboxdefaultbutton?view=netframework-4.5.1#fields"
+        usageText &= Environment.NewLine & "https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.messageboxoptions?view=netframework-4.5.1#fields"
+
         Return usageText
     End Function
 
