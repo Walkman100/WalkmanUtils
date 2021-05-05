@@ -18,10 +18,10 @@ Public Module MsgBoxCommon
         End Using
 
         usageText &= Environment.NewLine & "For values, see:"
-        usageText &= Environment.NewLine & "https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.messageboxbuttons?view=netframework-4.5.1#fields"
-        usageText &= Environment.NewLine & "https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.messageboxicon?view=netframework-4.5.1#fields"
-        usageText &= Environment.NewLine & "https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.messageboxdefaultbutton?view=netframework-4.5.1#fields"
-        usageText &= Environment.NewLine & "https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.messageboxoptions?view=netframework-4.5.1#fields"
+        usageText &= Environment.NewLine & "https://walkman100.github.io/msgboxbuttons"
+        usageText &= Environment.NewLine & "https://walkman100.github.io/msgboxicon"
+        usageText &= Environment.NewLine & "https://walkman100.github.io/msgboxdefault"
+        usageText &= Environment.NewLine & "https://walkman100.github.io/msgboxoptions"
 
         Return usageText
     End Function
