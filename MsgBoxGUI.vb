@@ -24,7 +24,19 @@ Class MsgBoxGUI
     Inherits Form
 
     Shared Function ShowUsage(Optional input As String = Nothing) As Boolean
-        MessageBox.Show(GetUsage(input), "Program Usage", MessageBoxButtons.OK, MessageBoxIcon.Information)
+        Dim formToShow As New CustomMsgBoxForm With {
+            .Prompt = GetUsage(input),
+            .Title = "Program Usage",
+            .Buttons = MessageBoxButtons.OK,
+            .FormLevel = MessageBoxIcon.Information,
+            .ShowInTaskbar = True,
+            .Width = 1100
+        }
+        formToShow.MainText.Font = New Drawing.Font("Consolas", 9)
+        formToShow.MainText.MaximumSize = New Drawing.Size(1000, 0)
+        formToShow.MainText.Size = New Drawing.Size(1000, 0)
+        formToShow.ShowDialog()
+
         Environment.Exit(0)
         Return True
     End Function
