@@ -19,10 +19,15 @@ Module Program
         Return True
     End Function
 
+    Sub WriteError(format As String, arg0 As String)
+        Console.Error.WriteLine(format, arg0)
+    End Sub
+
     Sub Main(args() As String)
         Dim res As WalkmanLib.ResultInfo = WalkmanLib.ProcessArgs(args, flagDict, True)
 
-        If res.gotError Then
+        ' if res.gotError is true and res.errorInfo is Nothing, then there was an error but it was shown in ProcessArgs
+        If res.gotError AndAlso res.errorInfo IsNot Nothing Then
             ExitE(res.errorInfo)
         ElseIf res.extraParams.Count < 1 Then
             WriteUsage()

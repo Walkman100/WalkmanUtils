@@ -98,11 +98,17 @@ Public Module MsgBoxCommon
         Dim number As Integer
         If Integer.TryParse(value, number) Then
             If Not [Enum].IsDefined(GetType(TEnum), number) Then
+                WriteError("Incorrect value for {0} flag!", result.GetType().Name)
                 Return False
             End If
         End If
 
-        Return [Enum].TryParse(value, True, result)
+        If [Enum].TryParse(value, True, result) Then
+            Return True
+        Else
+            WriteError("Incorrect value for {0} flag!", result.GetType().Name)
+            Return False
+        End If
     End Function
 
     Sub DoMsgBox(args As List(Of String))

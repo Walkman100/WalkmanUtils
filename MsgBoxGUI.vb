@@ -18,6 +18,10 @@ Module MsgBoxCommonCompat
     Function WriteUsage(Optional input As String = Nothing) As Boolean
         Return MsgBoxGUI.ShowUsage(input)
     End Function
+
+    Sub WriteError(format As String, arg0 As String)
+        MessageBox.Show(String.Format(format, arg0), "Error processing arguments", MessageBoxButtons.OK, MessageBoxIcon.Error)
+    End Sub
 End Module
 
 Class MsgBoxGUI
@@ -45,7 +49,8 @@ Class MsgBoxGUI
         Dim args As String() = Environment.GetCommandLineArgs().Skip(1).ToArray()
         Dim res As WalkmanLib.ResultInfo = WalkmanLib.ProcessArgs(args, flagDict, True)
 
-        If res.gotError Then
+        ' if res.gotError is true and res.errorInfo is Nothing, then there was an error but it was shown in ProcessArgs
+        If res.gotError AndAlso res.errorInfo IsNot Nothing Then
             MessageBox.Show(res.errorInfo, "Error processing arguments", MessageBoxButtons.OK, MessageBoxIcon.Error)
         ElseIf res.extraParams.Count < 1 Then
             ShowUsage()
